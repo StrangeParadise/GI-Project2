@@ -5,7 +5,7 @@ using UnityEngine;
 public class MoveController : MonoBehaviour {
 
     // Variables
-    public float speed;
+    public float acceleration;
     public CameraController script;
 
 	private Rigidbody rb;
@@ -100,19 +100,19 @@ public class MoveController : MonoBehaviour {
     }
 
     private void moveFwd() {
-		rb.AddForce (Vector3.forward * speed);
+		rb.AddForce (Vector3.forward * acceleration);
     }
     private void moveBack()
     {
-		rb.AddForce (Vector3.back * speed);
+		rb.AddForce (Vector3.back * acceleration);
     }
     private void moveLeft()
     {
-		rb.AddForce (Vector3.left * speed);
+		rb.AddForce (Vector3.left * acceleration);
     }
     private void moveRight()
     {
-		rb.AddForce (Vector3.right * speed);
+		rb.AddForce (Vector3.right * acceleration);
     }
 
 }
