@@ -6,21 +6,15 @@ public class PointLight : MonoBehaviour {
 
     // The color of the point light
     public Color color;
-    // Rotation speed
-    public float rotateSpeed;
-    // Rotation radius
-    public float radius;
+    // Height of the lighr source
+    public float height;
 
     private float centreX, centreZ, centreY;
 
     // Use this for initialization
     void Start() {
 
-        centreX = 0;
-        centreY = 0;
-        centreZ = 0;
-
-        //this.transform.position = new Vector3(centreX + Mathf.Sqrt(2) * radius, centreY, centreZ + Mathf.Sqrt(2) * radius);
+        this.transform.position = new Vector3(0, height, 0);
     }
 
     // Update is called once per frame
