@@ -8,11 +8,11 @@ public class MoveController : MonoBehaviour {
     public float speed;
     public CameraController script;
 
-    private Transform playerTrans;
+	private Rigidbody rb;
 
 	// Use this for initialization
 	void Start () {
-        playerTrans = this.transform;
+		rb = GetComponent<Rigidbody> ();
 	}
 	
 	// Update is called once per frame
@@ -100,19 +100,19 @@ public class MoveController : MonoBehaviour {
     }
 
     private void moveFwd() {
-        playerTrans.Translate(Vector3.forward * speed * Time.deltaTime);
+		rb.AddForce (Vector3.forward * speed);
     }
     private void moveBack()
     {
-        playerTrans.Translate(Vector3.back * speed * Time.deltaTime);
+		rb.AddForce (Vector3.back * speed);
     }
     private void moveLeft()
     {
-        playerTrans.Translate(Vector3.left * speed * Time.deltaTime);
+		rb.AddForce (Vector3.left * speed);
     }
     private void moveRight()
     {
-        playerTrans.Translate(Vector3.right * speed * Time.deltaTime);
+		rb.AddForce (Vector3.right * speed);
     }
 
 }
