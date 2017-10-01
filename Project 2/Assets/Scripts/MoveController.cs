@@ -17,7 +17,13 @@ public class MoveController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        move(script.orin);
+		if (Input.GetKey(KeyCode.LeftShift)) {
+			acceleration *= 2;
+			move (script.orin);
+			acceleration /= 2;
+		} else {
+			move (script.orin);
+		}
 	}
 
     private void move(int orin) {
