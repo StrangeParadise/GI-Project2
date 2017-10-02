@@ -1,90 +1,227 @@
-﻿using System.Collections;using System.Collections.Generic;using UnityEngine;public class GameMapGenerator : MonoBehaviour {
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using UnityEngine;
 
+public class GameMapGenerator : MonoBehaviour {
 
+    // Filename of the map
+    public string mapFilename;
+    // The size of each element in the game map
+    public float unitSize;
     // The shader for the game map
     public Shader shader;
     // The light object
     public PointLight pointLight;
 
-    // Heightmap <temporarily> storing the height information of the game map.
-    private float[,] heightmap;
+    // The raw data of the game map (explained in README located at /Asset/GameMap/)
+    private List<int[]> rawMap;
+
+    // Vertices and normals of the game terrain.
+    List<Vector3[,]> vertices, normals;
+
+
     // Use this for initialization
-    void Start() {        CreateHeightMap(1, 0,0);        
-        // Add a MeshRenderer component. This component actually renders the mesh that
-        // is defined by the MeshFilter component.
-        MeshRenderer renderer = this.gameObject.AddComponent<MeshRenderer>();        renderer.material.shader = shader;    }
-
-    // Update is called once per frame
-    void Update() {        MeshRenderer renderer = this.gameObject.GetComponent<MeshRenderer>();
-
-        // Pass updated light positions to shader.
-        renderer.material.SetColor("_PointLightColor", this.pointLight.color);        renderer.material.SetVector("_PointLightPosition", this.pointLight.GetWorldPosition());    }
-
-    // Generate the vector of a vertex.
-    public Vector3 GetVertex(int i, int j) {        return new Vector3((float)i, 0.0f, (float)j);    }
+    void Start() {
+        // Read map information from file.
+        rawMap = ReadMapFile();
 
 
-    // Calculate and generate the vertex normal for a vertex.
-    public Vector3 GetVertexNormal(int i, int j) {        Vector3 norm = new Vector3(0.0f, 1.0f, 0.0f);
+        // Initialize and generate vertices for the game.
+        vertices = new List<Vector3[,]>();
+        normals = new List<Vector3[,]>();
+        CreateVertices();
 
-        // Ignore vertex normals for those points on the edges,
-        //  assign them to be (0, 1, 0) (upright).
-        // Calculatate normals vector for 4 adjacent surfaces, 
-        //  and normalize the sum of those four vectors.
-        if (i != 0 && j != 0) {            Vector3 norm1 = Vector3.Cross((GetVertex(i, j - 1) - GetVertex(i, j)),                (GetVertex(i - 1, j) - GetVertex(i, j))).normalized;            Vector3 norm2 = Vector3.Cross((GetVertex(i + 1, j) - GetVertex(i, j)),                (GetVertex(i, j - 1) - GetVertex(i, j))).normalized;            Vector3 norm3 = Vector3.Cross((GetVertex(i, j + 1) - GetVertex(i, j)),                (GetVertex(i + 1, j) - GetVertex(i, j))).normalized;            Vector3 norm4 = Vector3.Cross((GetVertex(i - 1, j) - GetVertex(i, j)),                (GetVertex(i, j + 1) - GetVertex(i, j))).normalized;            norm = (norm1 + norm2 + norm3 + norm4).normalized;        }        return norm;    }    void CreateHeightMap(int n, int x, int z) {
-        switch (n) {
-            case 1:
-                heightmap = new float[20, 20];
-                break;
-            default:
-                heightmap = null;
-                break;
-        }
-        
-        // Create the terrain mesh from the generated heightmap.
-        CreateMapMesh(1, heightmap);
-    }
+        // Create map mesh from the raw map data.
+        Mesh m = CreateMapMesh();
 
-    // Create the terrain mesh from the generated heightmap.
-    Mesh CreateMapMesh(int index, float[,] heightmap) {
-
-        // Add MeshFilter and MeshCollider components to every element of the game map.
+        // Add MeshFilter and MeshCollider components to the game map, and assign the mesh to them.
         MeshFilter terrainMesh = this.gameObject.AddComponent<MeshFilter>();
         MeshCollider col = this.gameObject.AddComponent<MeshCollider>();
 
+        terrainMesh.mesh = m;
+        col.sharedMesh = m;
+
+        // Add a MeshRenderer component. This component actually renders the mesh that
+        // is defined by the MeshFilter component.
+        MeshRenderer renderer = this.gameObject.AddComponent<MeshRenderer>();
+        renderer.material.shader = shader;
+    }
+
+
+    // Update is called once per frame
+    void Update() {
+        MeshRenderer renderer = this.gameObject.GetComponent<MeshRenderer>();
+
+        // Pass updated light positions to shader.
+        renderer.material.SetColor("_PointLightColor", this.pointLight.color);
+        renderer.material.SetVector("_PointLightPosition", this.pointLight.GetWorldPosition());
+    }
+
+
+    // Generate the vector of a vertex.
+    public Vector3 GetVertex(float x, float height, float z) {
+
+        return new Vector3(x, height, z);
+    }
+
+
+    // Generate the vector of a vertex when the parameters are integers.
+    public Vector3 GetIntVertex(int x, int height, int z) {
+
+        return new Vector3((float)x, (float)height, (float)z);
+    }
+
+
+    // Calculate and generate the vertex normal for a vertex.
+    public Vector3 GetVertexNormal() {
+
+        Vector3 norm = new Vector3(0.0f, 1.0f, 0.0f);
+
+        return norm;
+    }
+
+
+    // Read map information from file, and load it to List of int[].
+    private List<int[]> ReadMapFile() {
+        string filePath = Application.dataPath + "/GameMap/" + mapFilename;
+        Debug.Log(filePath);
+
+        // The game map file is a csv file, containing groups of 5 parameters:
+        //      X Location    Z Location    Terrain Type    Rotation     Height
+        //
+        // For more information, please read the README in /Asset/GameMap/.
+
+        StreamReader sr = new StreamReader(filePath);
+        var rawMap = new List<int[]>();
+
+        while (!sr.EndOfStream) {
+            string[] line = sr.ReadLine().Split(',');
+            int[] values = new int[5];
+            for (int i = 0; i < 5; i++)
+                values[i] = int.Parse(line[i]);
+            rawMap.Add(new int[] { values[0], values[1], values[2], values[3], values[4] });
+        }
+
+        Debug.Log("Map Elements Count: " + rawMap.Count);
+
+        return rawMap;
+    }
+
+    // Generate the heightmap from the raw map data.
+    void CreateVertices() {
+        float x, z;
+        int type, rotation, height;
+        Vector3[,] vertex, normal;
+
+        for (int index = 0; index < rawMap.Count; index++) {
+
+            x = rawMap[index][0] * unitSize - unitSize / 2.0f;
+            z = rawMap[index][1] * unitSize - unitSize / 2.0f;
+            type = rawMap[index][2];
+            rotation = rawMap[index][3];
+            height = rawMap[index][4];
+
+            switch (type) {
+                case 1:
+                    vertex = new Vector3[2, 2];
+                    vertex[0, 0] = GetVertex(x, height, z);
+                    vertex[0, 1] = GetVertex(x, height, z + unitSize);
+                    vertex[1, 0] = GetVertex(x + unitSize, height, z);
+                    vertex[1, 1] = GetVertex(x + unitSize, height, z + unitSize);
+
+                    normal = new Vector3[2, 2];
+                    normal[0, 0] = new Vector3(0.0f, 1.0f, 0.0f);
+                    normal[0, 1] = new Vector3(0.0f, 1.0f, 0.0f);
+                    normal[1, 0] = new Vector3(0.0f, 1.0f, 0.0f);
+                    normal[1, 1] = new Vector3(0.0f, 1.0f, 0.0f);
+                    break;
+                default:
+                    vertex = null;
+                    normal = null;
+                    break;
+            }
+
+            vertices.Add(vertex);
+            normals.Add(normal);
+
+        }
+
+    }
+
+    // Create the terrain mesh from the generated heightmap.
+    Mesh CreateMapMesh() {
+
         // Create the new mesh for the terrain.
-        Mesh m = new Mesh();        m.name = "GameMapElement" + index.ToString();        m.Clear();
+        Mesh m = new Mesh();
+        m.name = "GameMapMesh";
+        m.Clear();
 
-        Debug.Log("!!!!");
+        // Initialize mesh parameters, storing them in List.
+        List<Vector3> new_vertices = new List<Vector3>();
+        List<Color> colors = new List<Color>();
+        List<int> triangles = new List<int>();
+        List<Vector3> new_normals = new List<Vector3>();
 
-        Vector3[] vertices = new Vector3[6 * (heightmap.GetLength(0) - 1) * (heightmap.GetLength(1) - 1)];        Color[] colors = new Color[vertices.Length];        int[] triangles = new int[vertices.Length];        Vector3[] normals = new Vector3[vertices.Length];        int i, j, k = 0;
+        // Process all elements of the game map, generating mesh for each of them.
+        for (int index = 0; index < rawMap.Count; index++) {
 
-        // Make triangles for the terrain, and assign vertex normals.
-        // For each square, there are two triangles to be drawn.
-        //
-        //          i + 0     i + 1
-        //
-        // j + 0      X---------X
-        //            |         |
-        //            |         |
-        // j + 1      X---------X
-        //
-        //
-        for (i = 0; i < heightmap.GetLength(0) - 1; i++) {            for (j = 0; j < heightmap.GetLength(1) - 1; j++) {
+            // Make triangles for the terrain, and assign vertex normals.
+            //                  x        x + 1
+            //
+            //        z         X==========X
+            //                  |          |
+            //                  |          |
+            //      z + 1       X==========X
+            //
+            //
+            for (int i = 0; i < vertices[index].GetLength(0) - 1; i++) {
+                for (int j = 0; j < vertices[index].GetLength(1) - 1; j++) {
 
-                // First triangle
-                vertices[k + 0] = GetVertex(i, j);                normals[k + 0] = GetVertexNormal(i, j);                vertices[k + 1] = GetVertex(i, j + 1);                normals[k + 1] = GetVertexNormal(i, j + 1);                vertices[k + 2] = GetVertex(i + 1, j + 1);                normals[k + 2] = GetVertexNormal(i + 1, j + 1);
+                    // First triangle
+                    new_vertices.Add(vertices[index][i, j]);
+                    new_normals.Add(normals[index][i, j]);
 
-                // Second Triangle
-                vertices[k + 3] = GetVertex(i, j);                normals[k + 3] = GetVertexNormal(i, j);                vertices[k + 4] = GetVertex(i + 1, j + 1);                normals[k + 4] = GetVertexNormal(i + 1, j + 1);                vertices[k + 5] = GetVertex(i + 1, j);                normals[k + 5] = GetVertexNormal(i + 1, j);                k += 6;            }        }
+                    new_vertices.Add(vertices[index][i, j + 1]);
+                    new_normals.Add(normals[index][i, j + 1]);
+
+                    new_vertices.Add(vertices[index][i + 1, j + 1]);
+                    new_normals.Add(normals[index][i + 1, j + 1]);
+
+                    // Second Triangle
+                    new_vertices.Add(vertices[index][i + 0, j + 0]);
+                    new_normals.Add(normals[index][i + 0, j + 0]);
+
+                    new_vertices.Add(vertices[index][i + 1, j + 1]);
+                    new_normals.Add(normals[index][i + 1, j + 1]);
+
+                    new_vertices.Add(vertices[index][i + 1, j + 0]);
+                    new_normals.Add(normals[index][i + 1, j + 0]);
+
+                }
+            }
+
+
+        }
 
         // Assign colors according to the height of the terrain.
-        for (k = 0; k < vertices.Length; k++) {            colors[k] = new Vector4(1.0f, 0.0f, 0.0f, 1.0f);        }
+        for (int k = 0; k < new_vertices.Count; k++) {
+            colors.Add(new Vector4(0.5f, 0.5f, 0.5f, 1.0f));
+        }
 
 
         // Assign triangle indices.
-        for (k = 0; k < vertices.Length; k++) {            triangles[k] = k;        }
-
+        for (int k = 0; k < new_vertices.Count; k++) {
+            triangles.Add(k);
+        }
 
         // Assign the calculated values to the mesh.
-        m.vertices = vertices;        m.colors = colors;        m.triangles = triangles;        m.normals = normals;        terrainMesh.mesh = m;        col.sharedMesh = terrainMesh.mesh;        return m;    }}
+        m.vertices = new_vertices.ToArray();
+        m.colors = colors.ToArray();
+        m.triangles = triangles.ToArray();
+        m.normals = new_normals.ToArray();
+
+        return m;
+    }
+
+}
