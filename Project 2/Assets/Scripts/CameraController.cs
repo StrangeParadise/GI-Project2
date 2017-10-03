@@ -9,7 +9,6 @@ public class CameraController : MonoBehaviour {
     public int orin;
 
     private Transform view;
-    private Transform playerTrans;
     private enum CamPos { Back, Right, Front, Left };
 
 	private Vector3 offset;
@@ -17,14 +16,13 @@ public class CameraController : MonoBehaviour {
     // Use this for initialization
     void Start () {
         view = this.transform;
-        playerTrans = player.transform;
         orin = (int)CamPos.Back;
-		offset = playerTrans.position - view.position;
+		offset = player.transform.position - view.position;
     }
 	
 	// Update is called once per frame
 	void Update () {
-		view.position = playerTrans.position - offset;
+		view.position = player.transform.position - offset;
         if (Input.GetKeyDown(KeyCode.E))
         {
             if (orin < 3)
@@ -55,11 +53,11 @@ public class CameraController : MonoBehaviour {
     private void camRotate(bool isClockwise) {
         if (isClockwise)
         {
-			view.RotateAround(playerTrans.position, Vector3.up, 90);
+			view.RotateAround(player.transform.position, Vector3.up, 90);
         }
         else {
-			view.RotateAround(playerTrans.position, Vector3.up, -90);
+			view.RotateAround(player.transform.position, Vector3.up, -90);
         }
-		offset = playerTrans.position - view.position;
+		offset = player.transform.position - view.position;
     }
 }

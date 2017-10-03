@@ -6,21 +6,31 @@ public class BallController : MonoBehaviour {
 
     // Variables
     public float acceleration;
-    public CameraController script;
     public float accConstant;
 
+    public Camera view;
+
+    public GameObject woodBall;
+    public GameObject stoneBall;
+    public GameObject metalBall;
+
     private Rigidbody rb;
+    private CameraController script;
 
     // Use this for initialization
     void Start() {
+        script = view.GetComponent<CameraController>();
         rb = GetComponent<Rigidbody>();
-        respawn();
     }
 
     // Update is called once per frame
     void Update() {
         if (transform.position.y < -10) {
             respawn();
+        }
+        if (Input.GetKeyDown(KeyCode.C)) {
+            int ballType = Random.Range(0, 3);
+            changeBall(ballType);
         }
         if (Input.GetKey(KeyCode.LeftShift)) {
             accelerate();
@@ -115,7 +125,32 @@ public class BallController : MonoBehaviour {
         move(script.orin);
         acceleration /= accConstant;
     }
-    private void changeBall() {
+    private void changeBall(int ballType) {
+        GameObject ball;
+        if (ballType == 0)
+        {
+            ball = woodBall;
+        }
+        else if (ballType == 1)
+        {
+            ball = stoneBall;
+        }
+        else {
+            ball = metalBall;
+        }
         
+        GameObject ballClone = (GameObject)Instantiate(ball, transform.position, transform.rotation);
+
+        
+        ballClone.GetComponent<BallController>().script = GetComponent<BallController>().script;
+        ballClone.GetComponent<BallController>().woodBall = GetComponent<BallController>().woodBall;
+        ballClone.GetComponent<BallController>().stoneBall = GetComponent<BallController>().stoneBall;
+        ballClone.GetComponent<BallController>().metalBall = GetComponent<BallController>().metalBall;
+        ballClone.GetComponent<BallController>().view = GetComponent<BallController>().view;
+        ballClone.GetComponent<BallController>().acceleration = GetComponent<BallController>().acceleration;
+        ballClone.GetComponent<BallController>().accConstant = GetComponent<BallController>().accConstant;
+
+        Destroy(gameObject);
+        script.player = ballClone;
     }
 }
