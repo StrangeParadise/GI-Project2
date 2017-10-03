@@ -28,7 +28,7 @@ public class BallController : MonoBehaviour {
         if (transform.position.y < -10) {
             respawn();
         }
-        if (Input.GetKeyDown(KeyCode.C)) {
+        if (Input.GetKeyDown(KeyCode.C) && isStable()) {
             int ballType = Random.Range(0, 3);
             changeBall(ballType);
         }
@@ -117,8 +117,7 @@ public class BallController : MonoBehaviour {
     }
     private void respawn() {
         transform.position = new Vector3(0, 2, 0);
-        rb.angularVelocity = Vector3.zero;
-        rb.velocity = Vector3.zero;
+        stablize();
     }
     private void accelerate() {
         acceleration *= accConstant;
@@ -152,5 +151,14 @@ public class BallController : MonoBehaviour {
 
         Destroy(gameObject);
         script.player = ballClone;
+    }
+
+    private void stablize() {
+        rb.angularVelocity = Vector3.zero;
+        rb.velocity = Vector3.zero;
+    }
+
+    private bool isStable() {
+        return rb.angularVelocity.magnitude <= 2 && rb.velocity.magnitude <= 2;
     }
 }
