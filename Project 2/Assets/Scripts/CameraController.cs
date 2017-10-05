@@ -25,6 +25,7 @@ public class CameraController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		view.position = playerTrans.position - offset;
+
         if (Input.GetKeyDown(KeyCode.E))
         {
             if (orin < 3)
