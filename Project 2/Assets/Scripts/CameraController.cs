@@ -31,35 +31,30 @@ public class CameraController : MonoBehaviour {
 	void Update () {
 		view.position = player.transform.position - offset;
 
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            if (orin < 3)
-            {
-                orin++;
-            }
-            else
-            {
-                orin = 0;
-            }
+		if (!isClockwise && !isAntiClockwise) {
 
-			isAntiClockwise = true;
-			delta_counter = 0.0f;
-        }
+			if (Input.GetKeyDown (KeyCode.E)) {
+				if (orin < 3) {
+					orin++;
+				} else {
+					orin = 0;
+				}
 
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            if (orin > 0)
-            {
-                orin--;
-            }
-            else
-            {
-                orin = 3;
-            }
+				isAntiClockwise = true;
+				delta_counter = 0.0f;
+			}
 
-			isClockwise = true;
-			delta_counter = 0.0f;
-        }
+			if (Input.GetKeyDown (KeyCode.Q)) {
+				if (orin > 0) {
+					orin--;
+				} else {
+					orin = 3;
+				}
+
+				isClockwise = true;
+				delta_counter = 0.0f;
+			}
+		}
 
 		if (isClockwise)
 		{
