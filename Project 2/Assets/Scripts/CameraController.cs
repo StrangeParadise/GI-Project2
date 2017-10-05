@@ -7,24 +7,29 @@ public class CameraController : MonoBehaviour {
     // Variables
     public GameObject player;
     public int orin;
+	public float rotation_speed;
 
     private Transform view;
-    private Transform playerTrans;
     private enum CamPos { Back, Right, Front, Left };
 
 	private Vector3 offset;
+	private bool isClockwise;
+	private bool isAntiClockwise;
+	private float delta_counter;
 
     // Use this for initialization
     void Start () {
         view = this.transform;
-        playerTrans = player.transform;
         orin = (int)CamPos.Back;
-		offset = playerTrans.position - view.position;
+		offset = player.transform.position - view.position;
+		isClockwise = false;
+		isAntiClockwise = false;
+		delta_counter = 0.0f;
     }
 	
 	// Update is called once per frame
 	void Update () {
-		view.position = playerTrans.position - offset;
+		view.position = player.transform.position - offset;
 
         if (Input.GetKeyDown(KeyCode.E))
         {
@@ -36,7 +41,9 @@ public class CameraController : MonoBehaviour {
             {
                 orin = 0;
             }
-            camRotate(false);
+
+			isAntiClockwise = true;
+			delta_counter = 0.0f;
         }
 
         if (Input.GetKeyDown(KeyCode.Q))
@@ -49,18 +56,31 @@ public class CameraController : MonoBehaviour {
             {
                 orin = 3;
             }
-            camRotate(true);
-        }
-    }
 
-    private void camRotate(bool isClockwise) {
-        if (isClockwise)
-        {
-			view.RotateAround(playerTrans.position, Vector3.up, 90);
+			isClockwise = true;
+			delta_counter = 0.0f;
         }
-        else {
-			view.RotateAround(playerTrans.position, Vector3.up, -90);
-        }
-		offset = playerTrans.position - view.position;
+
+		if (isClockwise)
+		{
+			view.RotateAround(player.transform.position, Vector3.up, Time.deltaTime * rotation_speed);
+			delta_counter += Time.deltaTime * rotation_speed;
+		}
+		if (isAntiClockwise) {
+			view.RotateAround(player.transform.position, Vector3.up, -Time.deltaTime * rotation_speed);
+			delta_counter += Time.deltaTime * rotation_speed;
+		}
+
+		if (delta_counter >= 90.0f) {
+			view.RotateAround(player.transform.position, Vector3.up, isClockwise?(90.0f - delta_counter):(delta_counter - 90.0f));
+			isClockwise = false;
+			isAntiClockwise = false;
+			delta_counter = 0.0f;
+		}
+
+		offset = player.transform.position - view.position;
+
+
     }
+		
 }
