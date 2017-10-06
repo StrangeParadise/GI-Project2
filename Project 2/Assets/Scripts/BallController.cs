@@ -25,6 +25,10 @@ public class BallController : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+        if (Input.GetKey("escape")) {
+            Application.Quit();
+            UnityEditor.EditorApplication.isPlaying = false;
+        } 
         if (transform.position.y < -10) {
             respawn();
         }
