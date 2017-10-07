@@ -25,7 +25,11 @@ public class BallController : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        if (Input.GetKey("escape")) {
+		if (Input.GetKey (KeyCode.Space)) {
+			rb.velocity = Vector3.zero;
+			rb.angularVelocity = Vector3.zero;
+		}
+		if (Input.GetKey(KeyCode.Escape)) {
             Application.Quit();
             UnityEditor.EditorApplication.isPlaying = false;
         } 
