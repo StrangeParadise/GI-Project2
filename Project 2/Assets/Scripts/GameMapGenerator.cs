@@ -9,6 +9,8 @@ public class GameMapGenerator : MonoBehaviour {
     public string mapFilename;
     // The size of each element in the game map
     public float unitSize;
+    // The zoom of the texture on the surface
+    public float textureZoom;
     // The shader for the game map
     public Shader shader;
     // The light object
@@ -46,8 +48,8 @@ public class GameMapGenerator : MonoBehaviour {
 
         // Add a MeshRenderer component. This component actually renders the mesh that
         // is defined by the MeshFilter component.
-        MeshRenderer renderer = this.gameObject.AddComponent<MeshRenderer>();
-        renderer.material.shader = shader;
+        MeshRenderer renderer = this.gameObject.gameObject.GetComponent<MeshRenderer>();
+        //renderer.material.shader = shader;
     }
 
 
@@ -140,10 +142,10 @@ public class GameMapGenerator : MonoBehaviour {
                     normal[1, 1] = new Vector3(0.0f, 1.0f, 0.0f);
 
                     uv = new Vector2[2, 2];
-                    uv[0, 0] = new Vector2(0.0f, 0.0f);
-                    uv[0, 1] = new Vector2(0.0f, 1.0f);
-                    uv[1, 0] = new Vector2(1.0f, 0.0f);
-                    uv[1, 1] = new Vector2(1.0f, 1.0f);
+                    uv[0, 0] = new Vector2(0.0f * textureZoom, 0.0f * textureZoom);
+                    uv[0, 1] = new Vector2(0.0f * textureZoom, 1.0f * textureZoom);
+                    uv[1, 0] = new Vector2(1.0f * textureZoom, 0.0f * textureZoom);
+                    uv[1, 1] = new Vector2(1.0f * textureZoom, 1.0f * textureZoom);
                     break;
                 default:
                     vertex = null;
