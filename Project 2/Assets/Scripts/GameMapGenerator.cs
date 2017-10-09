@@ -19,6 +19,7 @@ public class GameMapGenerator : MonoBehaviour {
 
     // Vertices and normals of the game terrain.
     List<Vector3[,]> vertices, normals;
+    List<Vector2[,]> uvs;
 
 
     // Use this for initialization
@@ -30,6 +31,7 @@ public class GameMapGenerator : MonoBehaviour {
         // Initialize and generate vertices for the game.
         vertices = new List<Vector3[,]>();
         normals = new List<Vector3[,]>();
+        uvs = new List<Vector2[,]>();
         CreateVertices();
 
         // Create map mesh from the raw map data.
@@ -113,6 +115,7 @@ public class GameMapGenerator : MonoBehaviour {
         float x, z;
         int type, rotation, height;
         Vector3[,] vertex, normal;
+        Vector2[,] uv;
 
         for (int index = 0; index < rawMap.Count; index++) {
 
@@ -135,15 +138,23 @@ public class GameMapGenerator : MonoBehaviour {
                     normal[0, 1] = new Vector3(0.0f, 1.0f, 0.0f);
                     normal[1, 0] = new Vector3(0.0f, 1.0f, 0.0f);
                     normal[1, 1] = new Vector3(0.0f, 1.0f, 0.0f);
+
+                    uv = new Vector2[2, 2];
+                    uv[0, 0] = new Vector2(0.0f, 0.0f);
+                    uv[0, 1] = new Vector2(0.0f, 1.0f);
+                    uv[1, 0] = new Vector2(1.0f, 0.0f);
+                    uv[1, 1] = new Vector2(1.0f, 1.0f);
                     break;
                 default:
                     vertex = null;
                     normal = null;
+                    uv = null;
                     break;
             }
 
             vertices.Add(vertex);
             normals.Add(normal);
+            uvs.Add(uv);
 
         }
 
@@ -162,6 +173,7 @@ public class GameMapGenerator : MonoBehaviour {
         List<Color> colors = new List<Color>();
         List<int> triangles = new List<int>();
         List<Vector3> new_normals = new List<Vector3>();
+        List<Vector2> new_uvs = new List<Vector2>();
 
         // Process all elements of the game map, generating mesh for each of them.
         for (int index = 0; index < rawMap.Count; index++) {
@@ -181,22 +193,28 @@ public class GameMapGenerator : MonoBehaviour {
                     // First triangle
                     new_vertices.Add(vertices[index][i, j]);
                     new_normals.Add(normals[index][i, j]);
+                    new_uvs.Add(uvs[index][i, j]);
 
                     new_vertices.Add(vertices[index][i, j + 1]);
                     new_normals.Add(normals[index][i, j + 1]);
+                    new_uvs.Add(uvs[index][i, j + 1]);
 
                     new_vertices.Add(vertices[index][i + 1, j + 1]);
                     new_normals.Add(normals[index][i + 1, j + 1]);
+                    new_uvs.Add(uvs[index][i + 1, j + 1]);
 
                     // Second Triangle
                     new_vertices.Add(vertices[index][i + 0, j + 0]);
                     new_normals.Add(normals[index][i + 0, j + 0]);
+                    new_uvs.Add(uvs[index][i, j]);
 
                     new_vertices.Add(vertices[index][i + 1, j + 1]);
                     new_normals.Add(normals[index][i + 1, j + 1]);
+                    new_uvs.Add(uvs[index][i + 1, j + 1]);
 
                     new_vertices.Add(vertices[index][i + 1, j + 0]);
                     new_normals.Add(normals[index][i + 1, j + 0]);
+                    new_uvs.Add(uvs[index][i + 1, j]);
 
                 }
             }
@@ -215,11 +233,13 @@ public class GameMapGenerator : MonoBehaviour {
             triangles.Add(k);
         }
 
+
         // Assign the calculated values to the mesh.
         m.vertices = new_vertices.ToArray();
         m.colors = colors.ToArray();
         m.triangles = triangles.ToArray();
         m.normals = new_normals.ToArray();
+        m.uv = new_uvs.ToArray();
 
         return m;
     }
