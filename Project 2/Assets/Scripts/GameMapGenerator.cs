@@ -78,9 +78,9 @@ public class GameMapGenerator : MonoBehaviour {
 
 
     // Calculate and generate the vertex normal for a vertex.
-    public Vector3 GetVertexNormal() {
+    public Vector3 GetVertexNormal(Vector3 self, Vector3 v1, Vector3 v2) {
 
-        Vector3 norm = new Vector3(0.0f, 1.0f, 0.0f);
+        Vector3 norm = Vector3.Cross((v1 - self), (v2 - self)).normalized;
 
         return norm;
     }
@@ -92,7 +92,8 @@ public class GameMapGenerator : MonoBehaviour {
         Debug.Log(filePath);
 
         // The game map file is a csv file, containing groups of 5 parameters:
-        //      X Location    Z Location    Terrain Type    Rotation     Height
+        //  X[0,0]   Z[0,0]   X[0,1]   Z[0,1]   X[1,0]   Z[1,0]   X[1,1]   Z[1,1]
+        //  Terrain Type     Height From     Height To
         //
         // For more information, please read the README in /Asset/GameMap/.
 
@@ -101,10 +102,11 @@ public class GameMapGenerator : MonoBehaviour {
 
         while (!sr.EndOfStream) {
             string[] line = sr.ReadLine().Split(',');
-            int[] values = new int[5];
-            for (int i = 0; i < 5; i++)
+            int[] values = new int[13];
+            for (int i = 0; i < 13; i++)
                 values[i] = int.Parse(line[i]);
-            rawMap.Add(new int[] { values[0], values[1], values[2], values[3], values[4] });
+            rawMap.Add(new int[] { values[0], values[1], values[2], values[3], values[4], values[5], values[6],
+                values[7], values[8], values[9], values[10], values[11], values[12] });
         }
 
         Debug.Log("Map Elements Count: " + rawMap.Count);
@@ -114,32 +116,31 @@ public class GameMapGenerator : MonoBehaviour {
 
     // Generate the heightmap from the raw map data.
     void CreateVertices() {
-        float x, z;
-        int type, rotation, height;
+        int type;
         Vector3[,] vertex, normal;
         Vector2[,] uv;
 
         for (int index = 0; index < rawMap.Count; index++) {
 
-            x = rawMap[index][0] * unitSize - unitSize / 2.0f;
-            z = rawMap[index][1] * unitSize - unitSize / 2.0f;
-            type = rawMap[index][2];
-            rotation = rawMap[index][3];
-            height = rawMap[index][4];
+            type = rawMap[index][8];
 
             switch (type) {
                 case 1:
                     vertex = new Vector3[2, 2];
-                    vertex[0, 0] = GetVertex(x, height, z);
-                    vertex[0, 1] = GetVertex(x, height, z + unitSize);
-                    vertex[1, 0] = GetVertex(x + unitSize, height, z);
-                    vertex[1, 1] = GetVertex(x + unitSize, height, z + unitSize);
+                    vertex[0, 0] = GetVertex(rawMap[index][0] * unitSize - unitSize / 2.0f,
+                        rawMap[index][9], rawMap[index][1] * unitSize - unitSize / 2.0f);
+                    vertex[0, 1] = GetVertex(rawMap[index][2] * unitSize - unitSize / 2.0f,
+                        rawMap[index][10], rawMap[index][3] * unitSize - unitSize / 2.0f);
+                    vertex[1, 0] = GetVertex(rawMap[index][4] * unitSize - unitSize / 2.0f,
+                        rawMap[index][11], rawMap[index][5] * unitSize - unitSize / 2.0f);
+                    vertex[1, 1] = GetVertex(rawMap[index][6] * unitSize - unitSize / 2.0f,
+                        rawMap[index][12], rawMap[index][7] * unitSize - unitSize / 2.0f);
 
                     normal = new Vector3[2, 2];
-                    normal[0, 0] = new Vector3(0.0f, 1.0f, 0.0f);
-                    normal[0, 1] = new Vector3(0.0f, 1.0f, 0.0f);
-                    normal[1, 0] = new Vector3(0.0f, 1.0f, 0.0f);
-                    normal[1, 1] = new Vector3(0.0f, 1.0f, 0.0f);
+                    normal[0, 0] = GetVertexNormal(vertex[0, 0], vertex[0, 1], vertex[1, 0]);
+                    normal[0, 1] = GetVertexNormal(vertex[0, 1], vertex[1, 1], vertex[0, 0]);
+                    normal[1, 0] = GetVertexNormal(vertex[1, 0], vertex[0, 0], vertex[1, 1]);
+                    normal[1, 1] = GetVertexNormal(vertex[1, 1], vertex[1, 0], vertex[0, 1]);
 
                     uv = new Vector2[2, 2];
                     uv[0, 0] = new Vector2(0.0f * textureZoom, 0.0f * textureZoom);
@@ -147,6 +148,7 @@ public class GameMapGenerator : MonoBehaviour {
                     uv[1, 0] = new Vector2(1.0f * textureZoom, 0.0f * textureZoom);
                     uv[1, 1] = new Vector2(1.0f * textureZoom, 1.0f * textureZoom);
                     break;
+
                 default:
                     vertex = null;
                     normal = null;
