@@ -29,7 +29,7 @@ public class BallController : MonoBehaviour {
         script = view.GetComponent<CameraController>();
         rb = GetComponent<Rigidbody>();
         lifeCount = 3;
-        destination = new Vector3(16.8f, 0.35f, -26.8f);
+        destination = new Vector3(16.8f, -0.15f, -28.0f);
         offset = 1.0f;
     }
 
@@ -190,7 +190,7 @@ public class BallController : MonoBehaviour {
 
     private void checkWin(Vector3 destination, float offset) {
         if (transform.position.x < destination.x + offset && transform.position.x > destination.x - offset 
-            && transform.position.z < destination.z + offset && transform.position.z > destination.z - offset && transform.position.y == destination.y + 0.5) {
+            && transform.position.z < destination.z + offset && transform.position.z > destination.z - offset && transform.position.y > destination.y + 0.4) {
             gameProcess.gameWin();
         }
     }
