@@ -29,6 +29,8 @@ public class BallController : MonoBehaviour {
         script = view.GetComponent<CameraController>();
         rb = GetComponent<Rigidbody>();
         lifeCount = 3;
+        destination = new Vector3(16.8f, 0.35f, -26.8f);
+        offset = 1.0f;
     }
 
     // Update is called once per frame
