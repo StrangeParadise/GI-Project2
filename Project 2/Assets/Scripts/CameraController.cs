@@ -33,7 +33,7 @@ public class CameraController : MonoBehaviour {
 
 		if (!isClockwise && !isAntiClockwise) {
 
-			if (Input.GetKeyDown (KeyCode.E)) {
+			if (Input.GetKeyDown (KeyCode.Q)) {
 				if (orin < 3) {
 					orin++;
 				} else {
@@ -44,7 +44,7 @@ public class CameraController : MonoBehaviour {
 				deltaCounter = 0.0f;
 			}
 
-			if (Input.GetKeyDown (KeyCode.Q)) {
+			if (Input.GetKeyDown (KeyCode.E)) {
 				if (orin > 0) {
 					orin--;
 				} else {
