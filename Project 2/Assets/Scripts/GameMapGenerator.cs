@@ -11,6 +11,8 @@ public class GameMapGenerator : MonoBehaviour {
     public float unitSize;
     // The zoom of the texture on the surface
     public float textureZoom;
+    // The thickness of the terrain
+    public float terrainThickness;
     // The shader for the game map
     public Shader shader;
     // The light object
@@ -160,6 +162,109 @@ public class GameMapGenerator : MonoBehaviour {
             normals.Add(normal);
             uvs.Add(uv);
 
+            CreateButtom(vertex);
+            CreateEdges(vertex);
+
+        }
+
+    }
+
+    // Create the buttom of the map terrain.
+    private void CreateButtom(Vector3[,] vertex) {
+
+        Vector3[,] new_vertex, normal;
+        Vector2[,] uv;
+
+
+    }
+
+    // Create 4 edges of the map terrain.
+    private void CreateEdges(Vector3[,] vertex) {
+        
+        Vector3[,] new_vertex, normal;
+        Vector2[,] uv;
+        int x1, x2, z1, z2;
+
+        new_vertex = new Vector3[2, 2];
+        new_vertex[1, 0] = new Vector3(vertex[0, 0].x, vertex[0, 0].y - terrainThickness, vertex[0, 0].z);
+        new_vertex[1, 1] = new Vector3(vertex[0, 1].x, vertex[0, 1].y - terrainThickness, vertex[0, 1].z);
+        new_vertex[0, 0] = new Vector3(vertex[1, 0].x, vertex[1, 0].y - terrainThickness, vertex[1, 0].z);
+        new_vertex[0, 1] = new Vector3(vertex[1, 1].x, vertex[1, 1].y - terrainThickness, vertex[1, 1].z);
+
+
+        normal = new Vector3[2, 2];
+        normal[0, 0] = GetVertexNormal(new_vertex[0, 0], new_vertex[0, 1], new_vertex[1, 0]);
+        normal[0, 1] = GetVertexNormal(new_vertex[0, 1], new_vertex[1, 1], new_vertex[0, 0]);
+        normal[1, 0] = GetVertexNormal(new_vertex[1, 0], new_vertex[0, 0], new_vertex[1, 1]);
+        normal[1, 1] = GetVertexNormal(new_vertex[1, 1], new_vertex[1, 0], new_vertex[0, 1]);
+
+        uv = new Vector2[2, 2];
+        uv[0, 0] = new Vector2(0.0f * textureZoom, 0.0f * textureZoom);
+        uv[0, 1] = new Vector2(0.0f * textureZoom, 1.0f * textureZoom);
+        uv[1, 0] = new Vector2(1.0f * textureZoom, 0.0f * textureZoom);
+        uv[1, 1] = new Vector2(1.0f * textureZoom, 1.0f * textureZoom);
+
+        vertices.Add(new_vertex);
+        normals.Add(normal);
+        uvs.Add(uv);
+
+        for (int i = 0; i < 4; i++) {
+            switch (i) {
+                case 0:
+                    x1 = 0;
+                    z1 = 0;
+                    x2 = 0;
+                    z2 = 1;
+                    break;
+                case 1:
+                    x1 = 0;
+                    z1 = 1;
+                    x2 = 1;
+                    z2 = 1;
+                    break;
+                case 2:
+                    x1 = 1;
+                    z1 = 1;
+                    x2 = 1;
+                    z2 = 0;
+                    break;
+                case 3:
+                    x1 = 1;
+                    z1 = 0;
+                    x2 = 0;
+                    z2 = 0;
+                    break;
+                default:
+                    x1 = 0;
+                    z1 = 0;
+                    x2 = 0;
+                    z2 = 0;
+                    break;
+            }
+
+            new_vertex = new Vector3[2, 2];
+            new_vertex[1, 0] = new Vector3(vertex[x1, z1].x, vertex[x1, z1].y, vertex[x1, z1].z);
+            new_vertex[1, 1] = new Vector3(vertex[x2, z2].x, vertex[x2, z2].y, vertex[x2, z2].z);
+            new_vertex[0, 0] = new Vector3(vertex[x1, z1].x, vertex[x1, z1].y - terrainThickness, vertex[x1, z1].z);
+            new_vertex[0, 1] = new Vector3(vertex[x2, z2].x, vertex[x2, z2].y - terrainThickness, vertex[x2, z2].z);
+
+
+            normal = new Vector3[2, 2];
+            normal[0, 0] = GetVertexNormal(new_vertex[0, 0], new_vertex[0, 1], new_vertex[1, 0]);
+            normal[0, 1] = GetVertexNormal(new_vertex[0, 1], new_vertex[1, 1], new_vertex[0, 0]);
+            normal[1, 0] = GetVertexNormal(new_vertex[1, 0], new_vertex[0, 0], new_vertex[1, 1]);
+            normal[1, 1] = GetVertexNormal(new_vertex[1, 1], new_vertex[1, 0], new_vertex[0, 1]);
+
+            uv = new Vector2[2, 2];
+            uv[0, 0] = new Vector2(0.0f * textureZoom, 0.0f * textureZoom);
+            uv[0, 1] = new Vector2(0.0f * textureZoom, 1.0f * textureZoom);
+            uv[1, 0] = new Vector2(1.0f * textureZoom, 0.0f * textureZoom);
+            uv[1, 1] = new Vector2(1.0f * textureZoom, 1.0f * textureZoom);
+
+            vertices.Add(new_vertex);
+            normals.Add(normal);
+            uvs.Add(uv);
+
         }
 
     }
@@ -180,7 +285,7 @@ public class GameMapGenerator : MonoBehaviour {
         List<Vector2> new_uvs = new List<Vector2>();
 
         // Process all elements of the game map, generating mesh for each of them.
-        for (int index = 0; index < rawMap.Count; index++) {
+        for (int index = 0; index < vertices.Count; index++) {
 
             // Make triangles for the terrain, and assign vertex normals.
             //                  x        x + 1
