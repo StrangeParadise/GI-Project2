@@ -14,27 +14,39 @@ public class BallController : MonoBehaviour {
     public GameObject stoneBall;
     public GameObject metalBall;
 
+    public int lifeCount;
+
+    public GameProcessController gameProcess;
+
     private Rigidbody rb;
     private CameraController script;
+
+    private Vector3 destination;
+    private float offset;
 
     // Use this for initialization
     void Start() {
         script = view.GetComponent<CameraController>();
         rb = GetComponent<Rigidbody>();
+        lifeCount = 3;
     }
 
     // Update is called once per frame
     void Update() {
-		if (Input.GetKey (KeyCode.Space)) {
-			rb.velocity = Vector3.zero;
-			rb.angularVelocity = Vector3.zero;
-		}
-		if (Input.GetKey(KeyCode.Escape)) {
-            Application.Quit();
-            UnityEditor.EditorApplication.isPlaying = false;
-        } 
-        if (transform.position.y < -10) {
+        if (Input.GetKey(KeyCode.Space)) {
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+        if (Input.GetKey(KeyCode.Escape)) {
+            gameProcess.quit();
+        }
+        if (transform.position.y < -10 && lifeCount > 0)
+        {
             respawn();
+            lifeCount--;
+        }
+        else if (lifeCount == 0 && transform.position.y < -10) {
+            gameProcess.gameOver();
         }
         if (Input.GetKeyDown(KeyCode.C) && isStable()) {
             int ballType = Random.Range(0, 3);
@@ -46,6 +58,7 @@ public class BallController : MonoBehaviour {
         else {
             move(script.orin);
         }
+        checkWin(destination, offset);
     }
 
     private void move(int orin) {
@@ -145,17 +158,20 @@ public class BallController : MonoBehaviour {
         else {
             ball = metalBall;
         }
-        
+
         GameObject ballClone = (GameObject)Instantiate(ball, transform.position, transform.rotation);
 
-        
-        ballClone.GetComponent<BallController>().script = GetComponent<BallController>().script;
-        ballClone.GetComponent<BallController>().woodBall = GetComponent<BallController>().woodBall;
-        ballClone.GetComponent<BallController>().stoneBall = GetComponent<BallController>().stoneBall;
-        ballClone.GetComponent<BallController>().metalBall = GetComponent<BallController>().metalBall;
-        ballClone.GetComponent<BallController>().view = GetComponent<BallController>().view;
-        ballClone.GetComponent<BallController>().acceleration = GetComponent<BallController>().acceleration;
-        ballClone.GetComponent<BallController>().accConstant = GetComponent<BallController>().accConstant;
+
+        ballClone.GetComponent<BallController>().script = script;
+        ballClone.GetComponent<BallController>().woodBall = woodBall;
+        ballClone.GetComponent<BallController>().stoneBall = stoneBall;
+        ballClone.GetComponent<BallController>().metalBall = metalBall;
+        ballClone.GetComponent<BallController>().view = view;
+        ballClone.GetComponent<BallController>().acceleration = acceleration;
+        ballClone.GetComponent<BallController>().accConstant = accConstant;
+        ballClone.GetComponent<BallController>().gameProcess = gameProcess;
+        ballClone.GetComponent<BallController>().lifeCount = lifeCount;
+        print("lifeCount == " + lifeCount);
 
         Destroy(gameObject);
         script.player = ballClone;
@@ -168,5 +184,21 @@ public class BallController : MonoBehaviour {
 
     private bool isStable() {
         return rb.angularVelocity.magnitude <= 2 && rb.velocity.magnitude <= 2;
+    }
+
+    private void checkWin(Vector3 destination, float offset) {
+        if (transform.position.x < destination.x + offset && transform.position.x > destination.x - offset 
+            && transform.position.z < destination.z + offset && transform.position.z > destination.z - offset && transform.position.y == destination.y + 0.5) {
+            gameProcess.gameWin();
+        }
+    }
+
+    public void setDestination(Vector3 destination)
+    {
+        this.destination = destination;
+    }
+    public void setOffset(float offset)
+    {
+        this.offset = offset;
     }
 }
