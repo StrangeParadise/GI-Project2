@@ -107,8 +107,8 @@
 			fixed4 frag(v2f IN) : SV_Target
 			{
 				float2 offset = float2(
-					tex2D ( _CustomTex, float2(IN.worldPosition.y / _DistortionSpreader + _Time[1] / _TimeDamper, 0)).r ,
-				 	tex2D ( _CustomTex, float2(_Time[1] / _TimeDamper , IN.worldPosition.x / _DistortionSpreader )).r);
+					tex2D ( _CustomTex, float2(IN.worldPosition.y / _DistortionSpreader + sin(_Time[1] / _TimeDamper), 0)).r ,
+				 	tex2D ( _CustomTex, float2(sin(_Time[1] / _TimeDamper) , IN.worldPosition.x / _DistortionSpreader )).r);
 
 				offset -= 0.5;
 
