@@ -26,7 +26,9 @@ what we need to do is accelarate the ball by keeping pressing 'SHIFT' and
 'w'/UpArrow. 
 
 How you modelled objects and entities?
+Those different types of balls are stored as many prefabs and it is easier to utilize when making the function of changing the ball type.
 How you handled the graphics pipeline and camera motion?
+Camera motion is handled by modify the update function.
 
 There are three different types of shaders have been utilized in our game. They
 are Phong shader, Disappear shader and Toon Shader.
