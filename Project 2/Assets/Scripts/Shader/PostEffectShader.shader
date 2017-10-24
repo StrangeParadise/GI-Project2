@@ -44,7 +44,9 @@
 				fixed4 col = tex2D(_MainTex, i.uv);
 				// just invert the colors
 				// make the start scene a bit attracting from all blank to have whole brunch of stuffs
-				col = col *  _Time[1]/3;
+				if (_Time[1]/3 <= 1){
+					col = col *  _Time[1]/3;
+				}
 				return col;
 			}
 			ENDCG
