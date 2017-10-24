@@ -43,8 +43,8 @@ get to the destination. When the ball has a collision to other objects, we use
 discrete method to minimize the computation so that we have relatively high
 FPS.
 
-There are three different types of shaders have been utilized in our game. They
-are Phong shader, Disappear shader and Vibrate Shader.
+There are four different types of shaders have been utilized in our game. They
+are Phong shader, Disappear shader, Vibrate shader and Gradually show shader.
 
 Phong shader is used to help adjust the ambient, diffuse and specular to make
 the game much more realistic. Disappear shader is created for some special mode
@@ -55,13 +55,16 @@ Talking about the Vibrate shader used in this game, we used it on the words and
 the button since the whole environment we make is in the universe and it all
 happens in some different gravity environment. Therefore, we prefer that the
 words and the button is sometimes not stable and even shaking and falling apart
-to make it much more real and interesting.
+to make it much more real and interesting. The Gradually show shader is used when 
+starting the game. When the game starts, the scene will gradually show up which makes visual 
+experience softer.
 
 The participants are all Melbourne University students and we found 6 participants to play our
 game. We conduct a survey by paper to make their easier to understand and lead them to
 give us some useful suggestions. 
-1) There are 4 participants saying that they prefer to have some more effects to make it more interesting and not that quick
-to get bored from playing the game. Then we add more particle effects to make it more fancy.
+1) There are 4 participants saying that they prefer to have some more effects to make it more 
+interesting and not that quick to get bored from playing the game. Then we add more particle 
+effects to make it more fancy.
 2) Two Participants mentioned that they would like to play game with some
 background music. Based on that, background musics for menu and gameplay has
 been added. 
