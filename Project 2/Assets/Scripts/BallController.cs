@@ -16,6 +16,7 @@ public class BallController : MonoBehaviour {
     public GameObject metalBall;
 	public GameObject fireBall;
 
+	// The life that the player have
     public int lifeCount;
 
     public GameProcessController gameProcess;
@@ -35,6 +36,8 @@ public class BallController : MonoBehaviour {
         script = view.GetComponent<CameraController>();
         rb = GetComponent<Rigidbody>();
         lifeCount = 3;
+
+		// Set the destination for each level
 		if (SceneManager.GetActiveScene ().name == "Level1") {
 			destination = new Vector3 (16.8f, -0.15f, -28.0f);
 		} else if (SceneManager.GetActiveScene ().name == "Level2") {
@@ -46,25 +49,41 @@ public class BallController : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+
+		// Always check if the player is win
 		if (checkWin (destination, offset)) {
 			stablize ();
 			return;
 		}
+
+		// Need to be delete before submit
+		// For testing only
         if (Input.GetKey(KeyCode.Space)) {
             rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
         }
+		if (Input.GetKey (KeyCode.X)) {
+			transform.position = destination + Vector3.up;
+		}
+
+		// Press ESC to quit the game
         if (Input.GetKey(KeyCode.Escape)) {
             gameProcess.quit();
         }
+
+		// Automatically respawn if a player has life
         if (transform.position.y < -10 && lifeCount > 0)
         {
             respawn();
             lifeCount--;
         }
+
+		// If the player is dead and there is no life, then game over
         else if (lifeCount == 0 && transform.position.y < -10) {
             gameProcess.gameOver();
         }
+
+		// Press C to change the ball to other type
         if (Input.GetKeyDown(KeyCode.C) && isStable()) {
 			ballType++;
 			if (ballType > 3) {
@@ -72,15 +91,14 @@ public class BallController : MonoBehaviour {
 			}
             changeBall(ballType);
         }
+
+		// Press Left Shift to accelerate the ball
         if (Input.GetKey(KeyCode.LeftShift)) {
             accelerate();
         }
         else {
             move(script.orin);
         }
-		if (Input.GetKey (KeyCode.X)) {
-			transform.position = destination + Vector3.up;
-		}
     }
 
     // Set the parameter of the force
@@ -88,6 +106,7 @@ public class BallController : MonoBehaviour {
         this.Ka = Ka;
     }
 
+	// Move the ball
     private void move(int orin) {
         switch (orin) {
             case 0:
@@ -151,6 +170,7 @@ public class BallController : MonoBehaviour {
         }
     }
 
+	// Add force to the ball
     private void moveFwd() {
         rb.AddForce(Vector3.forward * acceleration * Ka);
     }
@@ -167,11 +187,15 @@ public class BallController : MonoBehaviour {
         transform.position = new Vector3(0, 2, 0);
         stablize();
     }
+
+	// Acceleration of the ball
     private void accelerate() {
         acceleration *= accConstant;
         move(script.orin);
         acceleration /= accConstant;
     }
+
+	// Change ball function
     private void changeBall(int ballType) {
         GameObject ball;
 		if (ballType == 0) {
@@ -208,15 +232,18 @@ public class BallController : MonoBehaviour {
         script.player = ballClone;
     }
 
+	// Stablize the bal
     private void stablize() {
         rb.angularVelocity = Vector3.zero;
         rb.velocity = Vector3.zero;
     }
 
+	// Check if the ball is stable
     private bool isStable() {
         return rb.angularVelocity.magnitude <= 2 && rb.velocity.magnitude <= 2;
     }
 
+	// Check if the ball is in the area of the destination
     private bool checkWin(Vector3 destination, float offset) {
         if (transform.position.x < destination.x + offset && transform.position.x > destination.x - offset 
             && transform.position.z < destination.z + offset && transform.position.z > destination.z - offset && transform.position.y > destination.y + 0.4) {
@@ -226,6 +253,7 @@ public class BallController : MonoBehaviour {
 		return false;
     }
 
+	// Setters
     public void setDestination(Vector3 destination)
     {
         this.destination = destination;
