@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class BallController : MonoBehaviour {
 
@@ -13,6 +14,7 @@ public class BallController : MonoBehaviour {
     public GameObject woodBall;
     public GameObject stoneBall;
     public GameObject metalBall;
+	public GameObject fireBall;
 
     public int lifeCount;
 
@@ -31,12 +33,20 @@ public class BallController : MonoBehaviour {
         script = view.GetComponent<CameraController>();
         rb = GetComponent<Rigidbody>();
         lifeCount = 3;
-        destination = new Vector3(16.8f, -0.15f, -28.0f);
+		if (SceneManager.GetActiveScene ().name == "Level1") {
+			destination = new Vector3 (16.8f, -0.15f, -28.0f);
+		} else if (SceneManager.GetActiveScene ().name == "Level2") {
+			destination = new Vector3(59.2f, -0.15f, 0.0f);
+		}
+        
         offset = 1.0f;
     }
 
     // Update is called once per frame
     void Update() {
+		if (checkWin (destination, offset)) {
+			return;
+		}
         if (Input.GetKey(KeyCode.Space)) {
             rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
@@ -53,7 +63,7 @@ public class BallController : MonoBehaviour {
             gameProcess.gameOver();
         }
         if (Input.GetKeyDown(KeyCode.C) && isStable()) {
-            int ballType = Random.Range(0, 3);
+            int ballType = Random.Range(0, 4);
             changeBall(ballType);
         }
         if (Input.GetKey(KeyCode.LeftShift)) {
@@ -62,7 +72,6 @@ public class BallController : MonoBehaviour {
         else {
             move(script.orin);
         }
-        checkWin(destination, offset);
     }
 
     // Set the parameter of the force
@@ -156,20 +165,18 @@ public class BallController : MonoBehaviour {
     }
     private void changeBall(int ballType) {
         GameObject ball;
-        if (ballType == 0)
-        {
-            Ka = 1.0f;
-            ball = woodBall;
-        }
-        else if (ballType == 1)
-        {
-            Ka = 5.0f;
-            ball = stoneBall;
-        }
-        else {
-            Ka = 3.0f;
-            ball = metalBall;
-        }
+		if (ballType == 0) {
+			Ka = 1.0f;
+			ball = woodBall;
+		} else if (ballType == 1) {
+			Ka = 5.0f;
+			ball = stoneBall;
+		} else if (ballType == 2) {
+			Ka = 3.0f;
+			ball = metalBall;
+		} else {
+			ball = fireBall;
+		}
 
         GameObject ballClone = (GameObject)Instantiate(ball, transform.position, transform.rotation);
 
@@ -178,6 +185,7 @@ public class BallController : MonoBehaviour {
         ballClone.GetComponent<BallController>().woodBall = woodBall;
         ballClone.GetComponent<BallController>().stoneBall = stoneBall;
         ballClone.GetComponent<BallController>().metalBall = metalBall;
+		ballClone.GetComponent<BallController>().fireBall = fireBall;
         ballClone.GetComponent<BallController>().view = view;
         ballClone.GetComponent<BallController>().acceleration = acceleration;
         ballClone.GetComponent<BallController>().accConstant = accConstant;
@@ -199,11 +207,13 @@ public class BallController : MonoBehaviour {
         return rb.angularVelocity.magnitude <= 2 && rb.velocity.magnitude <= 2;
     }
 
-    private void checkWin(Vector3 destination, float offset) {
+    private bool checkWin(Vector3 destination, float offset) {
         if (transform.position.x < destination.x + offset && transform.position.x > destination.x - offset 
             && transform.position.z < destination.z + offset && transform.position.z > destination.z - offset && transform.position.y > destination.y + 0.4) {
             gameProcess.gameWin();
+			return true;
         }
+		return false;
     }
 
     public void setDestination(Vector3 destination)

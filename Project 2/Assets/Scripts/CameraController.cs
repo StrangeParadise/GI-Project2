@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CameraController : MonoBehaviour {
 
@@ -25,8 +26,10 @@ public class CameraController : MonoBehaviour {
 		isClockwise = false;
 		isAntiClockwise = false;
 		deltaCounter = 0.0f;
-		orin = 3;
-		view.RotateAround(player.transform.position, Vector3.up, 90.0f);
+		if (SceneManager.GetActiveScene ().name == "Level2") {
+			orin = 3;
+			view.RotateAround(player.transform.position, Vector3.up, 90.0f);
+		}
     }
 	
 	// Update is called once per frame
