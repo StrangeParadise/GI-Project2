@@ -18,6 +18,8 @@ public class BallController : MonoBehaviour {
 
     public GameProcessController gameProcess;
 
+    // The parameter to multiply to the force for different types of ball
+    private float Ka = 1.0f;
     private Rigidbody rb;
     private CameraController script;
 
@@ -61,6 +63,11 @@ public class BallController : MonoBehaviour {
             move(script.orin);
         }
         checkWin(destination, offset);
+    }
+
+    // Set the parameter of the force
+    public void setKa(float Ka) {
+        this.Ka = Ka;
     }
 
     private void move(int orin) {
@@ -127,16 +134,16 @@ public class BallController : MonoBehaviour {
     }
 
     private void moveFwd() {
-        rb.AddForce(Vector3.forward * acceleration);
+        rb.AddForce(Vector3.forward * acceleration * Ka);
     }
     private void moveBack() {
-        rb.AddForce(Vector3.back * acceleration);
+        rb.AddForce(Vector3.back * acceleration * Ka);
     }
     private void moveLeft() {
-        rb.AddForce(Vector3.left * acceleration);
+        rb.AddForce(Vector3.left * acceleration * Ka);
     }
     private void moveRight() {
-        rb.AddForce(Vector3.right * acceleration);
+        rb.AddForce(Vector3.right * acceleration * Ka);
     }
     private void respawn() {
         transform.position = new Vector3(0, 2, 0);
@@ -151,13 +158,16 @@ public class BallController : MonoBehaviour {
         GameObject ball;
         if (ballType == 0)
         {
+            Ka = 1.0f;
             ball = woodBall;
         }
         else if (ballType == 1)
         {
+            Ka = 5.0f;
             ball = stoneBall;
         }
         else {
+            Ka = 3.0f;
             ball = metalBall;
         }
 
@@ -173,6 +183,7 @@ public class BallController : MonoBehaviour {
         ballClone.GetComponent<BallController>().accConstant = accConstant;
         ballClone.GetComponent<BallController>().gameProcess = gameProcess;
         ballClone.GetComponent<BallController>().lifeCount = lifeCount;
+        ballClone.GetComponent<BallController>().setKa(this.Ka);
         print("lifeCount == " + lifeCount);
 
         Destroy(gameObject);
