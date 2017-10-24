@@ -25,6 +25,8 @@ public class CameraController : MonoBehaviour {
 		isClockwise = false;
 		isAntiClockwise = false;
 		deltaCounter = 0.0f;
+		orin = 3;
+		view.RotateAround(player.transform.position, Vector3.up, 90.0f);
     }
 	
 	// Update is called once per frame
