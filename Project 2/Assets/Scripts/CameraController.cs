@@ -10,7 +10,8 @@ public class CameraController : MonoBehaviour {
 
 	// The orintation of the camera
     public int orin;
-	public float rotationSpeed;
+
+	public float rotation_speed;
 
     private Transform view;
     private enum CamPos { Back, Right, Front, Left };
@@ -65,12 +66,12 @@ public class CameraController : MonoBehaviour {
 
 		if (isClockwise)
 		{
-			view.RotateAround(player.transform.position, Vector3.up, Time.deltaTime * rotationSpeed);
-			deltaCounter += Time.deltaTime * rotationSpeed;
+			view.RotateAround(player.transform.position, Vector3.up, Time.deltaTime * rotation_speed);
+			deltaCounter += Time.deltaTime * rotation_speed;
 		}
 		if (isAntiClockwise) {
-			view.RotateAround(player.transform.position, Vector3.up, -Time.deltaTime * rotationSpeed);
-			deltaCounter += Time.deltaTime * rotationSpeed;
+			view.RotateAround(player.transform.position, Vector3.up, -Time.deltaTime * rotation_speed);
+			deltaCounter += Time.deltaTime * rotation_speed;
 		}
 
 		if (deltaCounter >= 90.0f) {
