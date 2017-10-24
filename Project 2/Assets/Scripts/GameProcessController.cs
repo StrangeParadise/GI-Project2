@@ -9,7 +9,7 @@ public class GameProcessController : MonoBehaviour {
     public GameObject gameOverCanvas;
     public GameObject gameWinCanvas;
 
-    private Scene activedScene;
+	private Scene activedScene;
 
 	// Use this for initialization
 	void Start () {
@@ -42,7 +42,4 @@ public class GameProcessController : MonoBehaviour {
 			SceneManager.LoadScene ("Level2");
 		}
 	}
-    public void showTip(Vector3 tipPoint, float offset, string tip) {
-
-    }
 }
