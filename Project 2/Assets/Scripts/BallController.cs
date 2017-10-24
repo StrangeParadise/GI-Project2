@@ -45,6 +45,7 @@ public class BallController : MonoBehaviour {
     // Update is called once per frame
     void Update() {
 		if (checkWin (destination, offset)) {
+			stablize ();
 			return;
 		}
         if (Input.GetKey(KeyCode.Space)) {
@@ -72,6 +73,9 @@ public class BallController : MonoBehaviour {
         else {
             move(script.orin);
         }
+		if (Input.GetKey (KeyCode.X)) {
+			transform.position = destination + Vector3.up;
+		}
     }
 
     // Set the parameter of the force
