@@ -70,5 +70,3 @@ background music. Based on that, background musics for menu and gameplay has
 been added. 
 3) Most of the participants are not a big fan of vibrate shader in the
 Menu scene so that the vibrate shader has been eliminated from the Menu scene.
-
-A statement  about  any  code/APIs  you have sourced/used  from  the internet that is not your own.
