@@ -212,7 +212,7 @@ public class BallController : MonoBehaviour {
 		}
 
         GameObject ballClone = (GameObject)Instantiate(ball, transform.position, transform.rotation);
-
+		ballClone.tag = "Player";
 
         ballClone.GetComponent<BallController>().script = script;
         ballClone.GetComponent<BallController>().woodBall = woodBall;

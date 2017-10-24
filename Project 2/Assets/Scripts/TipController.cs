@@ -6,16 +6,16 @@ using UnityEngine.UI;
 
 public class TipController : MonoBehaviour {
 
-	public GameObject ball;
+	private GameObject ball;
 	public GameObject tipCanvas;
 
 	// Use this for initialization
 	void Start () {
-		
 	}
 	
 	// Update is called once per frame
 	void Update () {
+		ball = GameObject.FindWithTag("Player");
 		showTip (generateTip (ball.transform.position));
 	}
 	public string generateTip(Vector3 current) {
@@ -31,6 +31,11 @@ public class TipController : MonoBehaviour {
 			}
 			if (inRange(current, new Vector3 (48.0f , 0.5f, -30.0f), 3)) {
 				return("Look! The Teleporter is ahead! Get in there!");
+			}
+		}
+		if (SceneManager.GetActiveScene ().name == "Level2") {
+			if (inRange(current, new Vector3 (26.0f , 0.0f, 0.0f), 3)) {
+				return("Maybe try another ball? Press C to change to the metal ball");
 			}
 		}
 		return null;
