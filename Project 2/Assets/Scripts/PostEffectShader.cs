@@ -7,7 +7,7 @@ public class PostEffectShader : MonoBehaviour {
 
 	public Material mat;
 
-	void OnRenderImage( RenderTexture src, RenderTexture dest){
+	void OnRenderImage(RenderTexture src, RenderTexture dest) {
 		Graphics.Blit(src, dest, mat);
 	}
 
