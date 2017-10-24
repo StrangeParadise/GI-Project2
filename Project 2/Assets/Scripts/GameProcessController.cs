@@ -37,6 +37,11 @@ public class GameProcessController : MonoBehaviour {
         Application.Quit();
         UnityEditor.EditorApplication.isPlaying = false;
     }
+	public void nextLevel() {
+		if (SceneManager.GetActiveScene ().name == "Level1") {
+			SceneManager.LoadScene ("Level2");
+		}
+	}
     public void showTip(Vector3 tipPoint, float offset, string tip) {
 
     }

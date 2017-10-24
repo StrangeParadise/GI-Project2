@@ -28,6 +28,8 @@ public class BallController : MonoBehaviour {
     private Vector3 destination;
     private float offset;
 
+	private int ballType = 0;
+
     // Use this for initialization
     void Start() {
         script = view.GetComponent<CameraController>();
@@ -36,7 +38,7 @@ public class BallController : MonoBehaviour {
 		if (SceneManager.GetActiveScene ().name == "Level1") {
 			destination = new Vector3 (16.8f, -0.15f, -28.0f);
 		} else if (SceneManager.GetActiveScene ().name == "Level2") {
-			destination = new Vector3(59.2f, -0.15f, 0.0f);
+			destination = new Vector3(59.2f, 0.85f, 0.0f);
 		}
         
         offset = 1.0f;
@@ -64,7 +66,10 @@ public class BallController : MonoBehaviour {
             gameProcess.gameOver();
         }
         if (Input.GetKeyDown(KeyCode.C) && isStable()) {
-            int ballType = Random.Range(0, 4);
+			ballType++;
+			if (ballType > 3) {
+				ballType = 0;
+			}
             changeBall(ballType);
         }
         if (Input.GetKey(KeyCode.LeftShift)) {
@@ -196,6 +201,7 @@ public class BallController : MonoBehaviour {
         ballClone.GetComponent<BallController>().gameProcess = gameProcess;
         ballClone.GetComponent<BallController>().lifeCount = lifeCount;
         ballClone.GetComponent<BallController>().setKa(this.Ka);
+		ballClone.GetComponent<BallController>().ballType = ballType;
         print("lifeCount == " + lifeCount);
 
         Destroy(gameObject);

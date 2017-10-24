@@ -80,5 +80,4 @@ public class CameraController : MonoBehaviour {
 
 		offset = player.transform.position - view.position;
     }
-		
 }
