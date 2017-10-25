@@ -56,16 +56,6 @@ public class BallController : MonoBehaviour {
 			return;
 		}
 
-		// Need to be delete before submit
-		// For testing only
-        if (Input.GetKey(KeyCode.Space)) {
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-        }
-		if (Input.GetKey (KeyCode.X)) {
-			transform.position = destination + Vector3.up;
-		}
-
 		// Press ESC to quit the game
         if (Input.GetKey(KeyCode.Escape)) {
             gameProcess.quit();
