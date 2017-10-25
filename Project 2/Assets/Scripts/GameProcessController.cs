@@ -32,14 +32,19 @@ public class GameProcessController : MonoBehaviour {
     public void restart() {
         SceneManager.LoadScene(activedScene.name);
     }
-    public void quit()
-    {
+    public void quit() {
         Application.Quit();
         UnityEditor.EditorApplication.isPlaying = false;
     }
-	public void nextLevel() {
+    public void backToMenu() {
+        SceneManager.LoadScene("Menu");
+    }
+    public void nextLevel() {
 		if (SceneManager.GetActiveScene ().name == "Level1") {
 			SceneManager.LoadScene ("Level2");
 		}
 	}
+    public void playAgain() {
+        SceneManager.LoadScene("Level1");
+    }
 }
