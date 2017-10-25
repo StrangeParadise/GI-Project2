@@ -26,15 +26,16 @@ public class TipController : MonoBehaviour {
 			if (inRange(current, new Vector3 (0.0f , 0.0f, 16.0f), 3)) {
 				return("Press Q and E to change the orintation of the camera");
 			}
-			if (inRange(current, new Vector3 (8.0f , 0.5f, 19.0f), 3)) {
+			if (inRange(current, new Vector3 (8.0f , 0.0f, 19.0f), 3)) {
 				return("Press Left SHIFT to accelerate");
 			}
-			if (inRange(current, new Vector3 (48.0f , 0.5f, -30.0f), 3)) {
+			if (inRange(current, new Vector3 (48.0f , 0.0f, -30.0f), 3)) {
 				return("Look! The Teleporter is ahead! Get in there!");
 			}
 		}
 		if (SceneManager.GetActiveScene ().name == "Level2") {
 			if (inRange(current, new Vector3 (26.0f , 0.0f, 0.0f), 3)) {
+				print ("11111");
 				return("Maybe try another ball? Press C to change to the metal ball");
 			}
 		}
