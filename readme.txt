@@ -12,7 +12,7 @@ D or Right Arrow    Move Right
 Q                   Camera rotate counter-clockwise
 E                   Camera rotate clockwise
 
-C                   Change the ball
+C                   Change the ball (Only when stationary)
 
 Left Shift          Accelerate
 
