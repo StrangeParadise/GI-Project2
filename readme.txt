@@ -15,8 +15,3 @@ E                   Camera rotate clockwise
 C                   Change the ball (Only when stationary)
 
 Left Shift          Accelerate
-
-
-******************************************************************************************
-Space               Stand Still (For development purpose only, hasn't been removed)
-X                   Skip current level (For development purpose only, hasn't been removed)
