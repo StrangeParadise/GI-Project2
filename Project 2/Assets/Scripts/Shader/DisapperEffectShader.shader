@@ -44,8 +44,8 @@
 				fixed4 col = tex2D(_MainTex, i.uv);
 				// just invert the colors
 				// around 2 seconds the whole screen will go blinded
-				if ( sin( _Time[1] * 2) + 0.9f < 1){
-					col = col * (sin( _Time[1] * 2) + 0.9f);
+				if ( sin( _Time[1] * 1.5) + 1.02f < 1){
+					col = col * (sin( _Time[1] * 1.5) + 1.02f);
 				}
 				return col;
 			}
